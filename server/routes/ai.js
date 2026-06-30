@@ -36,8 +36,7 @@ async function callGemini(apiKey, systemPrompt, userMessage) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ parts: [{ text: userMessage }] }],
+        contents: [{ parts: [{ text: `${systemPrompt}\n\n${userMessage}` }] }],
         generationConfig: { maxOutputTokens: 4096, temperature: 0.7 },
       }),
     }
