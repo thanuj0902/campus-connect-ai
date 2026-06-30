@@ -164,8 +164,9 @@ aiRouter.post('/evaluate-answer', async (req, res) => {
   }
 })
 
-function mockResponse(system, message) {
-  if (system.includes('resume')) {
+function mockResponse(system, _message) {
+  const s = system.toLowerCase()
+  if (s.includes('resume')) {
     return {
       atsScore: Math.floor(Math.random() * 40) + 55,
       missingKeywords: ['React', 'TypeScript', 'REST APIs', 'CI/CD'],
@@ -181,7 +182,7 @@ function mockResponse(system, message) {
       ],
     }
   }
-  if (system.includes('roadmap')) {
+  if (s.includes('roadmap')) {
     return {
       targetRole: 'Software Engineer',
       months: [
@@ -191,7 +192,7 @@ function mockResponse(system, message) {
       ],
     }
   }
-  if (system.includes('interview questions')) {
+  if (s.includes('interview')) {
     return {
       questions: [
         'Explain the difference between REST and GraphQL.',
@@ -202,7 +203,7 @@ function mockResponse(system, message) {
       ],
     }
   }
-  if (system.includes('evaluate')) {
+  if (s.includes('evaluate')) {
     return {
       score: Math.floor(Math.random() * 40) + 55,
       feedback: 'Good answer! Consider adding more specific examples and technical depth.',
