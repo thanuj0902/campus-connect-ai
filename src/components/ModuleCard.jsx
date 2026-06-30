@@ -1,0 +1,15 @@
+export default function ModuleCard({ icon, title, description, path, gradient, index = 0 }) {
+  return (
+    <a
+      href={path}
+      className="card card-hover p-6 fade-in group"
+      style={{ animationDelay: `${index * 0.1}s` }}
+    >
+      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} text-white flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+        {icon}
+      </div>
+      <h3 className="font-semibold text-lg mb-1.5 group-hover:text-primary transition-colors">{title}</h3>
+      <p className="text-text-muted text-sm leading-relaxed">{description}</p>
+    </a>
+  )
+}
