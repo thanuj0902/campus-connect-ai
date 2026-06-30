@@ -1,16 +1,103 @@
-# React + Vite
+# CampusConnect AI
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+AI-powered career co-pilot for engineering students. Get personalized resume feedback, career roadmaps, interview practice, and opportunity matching — all powered by AI.
 
-Currently, two official plugins are available:
+## Problem
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+70% of engineering students in India struggle to translate their academic skills into job-ready profiles. Career guidance is either too generic (YouTube) or too expensive (paid mentors). CampusConnect AI bridges this gap with a free, AI-powered tool.
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **AI Resume Analyzer** — Upload a PDF resume, get an ATS score, missing keywords, weak points, and actionable suggestions
+- **Career Roadmap Generator** — Generate month-by-month learning plans with free resources based on your target role
+- **AI Mock Interview** — Practice domain-specific interviews (Web Dev, AI/ML, Data Science, etc.) with real-time AI feedback
+- **Opportunity Matcher** — Discover internships and hackathons that match your skill set
 
-## Expanding the Oxlint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+- **Frontend:** React (Vite) + Tailwind CSS
+- **Backend:** Node.js + Express
+- **AI:** Anthropic Claude API
+- **Auth:** Firebase Authentication (Google Sign-in)
+- **Database:** Firebase Firestore
+- **PDF parsing:** pdf-parse
+
+## Project Structure
+
+```
+campus-connect-ai/
+├── src/
+│   ├── components/   # Reusable UI components
+│   ├── pages/        # Page components (7 pages)
+│   ├── services/     # API client & Firebase config
+│   ├── context/      # Auth context
+│   └── data/         # Sample opportunity data
+├── server/
+│   ├── index.js      # Express server
+│   └── routes/       # Claude API proxy routes
+├── .env              # Frontend env vars (Firebase)
+└── vite.config.js    # Vite config with Tailwind + proxy
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- Anthropic Claude API key
+- Firebase project (for auth — optional, app works without it)
+
+### Installation
+
+```bash
+# Clone the repo
+git clone https://github.com/thanuj0902/campus-connect-ai.git
+cd campus-connect-ai
+
+# Install frontend dependencies
+npm install
+
+# Install server dependencies
+cd server && npm install && cd ..
+```
+
+### Configuration
+
+1. Copy `.env` and add your Firebase credentials:
+```
+VITE_FIREBASE_API_KEY=your-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+# VITE_API_URL=https://your-backend.onrender.com  # for production only
+```
+
+2. Create `server/.env` with your Claude API key:
+```
+ANTHROPIC_API_KEY=sk-ant-...
+PORT=3001
+```
+
+### Run Locally
+
+```bash
+# Terminal 1 — Backend
+cd server && npm start
+
+# Terminal 2 — Frontend
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173).
+
+## Deployment
+
+- **Frontend:** Deploy to Vercel (points to `dist/` folder)
+- **Backend:** Deploy to Render (points to `server/` folder)
+- Set the same environment variables in your hosting dashboard
+
+## License
+
+MIT
