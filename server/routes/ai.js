@@ -192,6 +192,13 @@ function mockResponse(system, _message) {
       ],
     }
   }
+  if (s.includes('evaluate')) {
+    return {
+      score: Math.floor(Math.random() * 40) + 55,
+      feedback: 'Good answer! Consider adding more specific examples and technical depth.',
+      idealAnswer: 'A strong answer would include specific technical details, real-world examples, and show depth of understanding.',
+    }
+  }
   if (s.includes('interview')) {
     return {
       questions: [
@@ -201,13 +208,6 @@ function mockResponse(system, _message) {
         'What is the difference between SQL and NoSQL databases?',
         'How would you design a URL shortening service?',
       ],
-    }
-  }
-  if (s.includes('evaluate')) {
-    return {
-      score: Math.floor(Math.random() * 40) + 55,
-      feedback: 'Good answer! Consider adding more specific examples and technical depth.',
-      idealAnswer: 'A strong answer would include specific technical details, real-world examples, and show depth of understanding.',
     }
   }
   return { message: 'Mock response' }
