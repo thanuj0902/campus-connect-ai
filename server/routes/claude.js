@@ -1,6 +1,9 @@
+import { createRequire } from 'module'
 import { Router } from 'express'
 import multer from 'multer'
-import pdfParse from 'pdf-parse'
+
+const require = createRequire(import.meta.url)
+const pdfParse = require('pdf-parse')
 
 export const claudeRouter = Router()
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
