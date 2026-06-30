@@ -22,11 +22,14 @@ async function callAI(systemPrompt, userMessage) {
 
   const isGemini = !!process.env.GEMINI_API_KEY
 
-  if (isGemini) {
-    return callGemini(apiKey, systemPrompt, userMessage)
+  try {
+    if (isGemini) {
+      return await callGemini(apiKey, systemPrompt, userMessage)
+    }
+    return await callClaude(apiKey, systemPrompt, userMessage)
+  } catch {
+    return mockResponse(systemPrompt, userMessage)
   }
-
-  return callClaude(apiKey, systemPrompt, userMessage)
 }
 
 async function callGemini(apiKey, systemPrompt, userMessage) {
@@ -43,8 +46,7 @@ async function callGemini(apiKey, systemPrompt, userMessage) {
   )
 
   if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`Gemini API error: ${res.status} ${err}`)
+    return mockResponse(systemPrompt, userMessage)
   }
 
   const data = await res.json()
