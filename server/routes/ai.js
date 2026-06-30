@@ -8,7 +8,7 @@ const pdfParse = require('pdf-parse')
 export const aiRouter = Router()
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
 
-const MODEL = 'gemini-1.5-flash'
+const MODEL = 'gemini-2.0-flash'
 
 function getApiKey() {
   return process.env.GEMINI_API_KEY || process.env.ANTHROPIC_API_KEY
