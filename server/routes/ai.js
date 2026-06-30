@@ -16,7 +16,7 @@ function getApiKey() {
 
 async function callAI(systemPrompt, userMessage) {
   const apiKey = getApiKey()
-  if (!apiKey || apiKey === 'your-api-key') {
+  if (!apiKey || apiKey.startsWith('your-')) {
     return mockResponse(systemPrompt, userMessage)
   }
 
@@ -31,7 +31,7 @@ async function callAI(systemPrompt, userMessage) {
 
 async function callGemini(apiKey, systemPrompt, userMessage) {
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
