@@ -17,7 +17,7 @@ AI-powered career co-pilot for engineering students. Get personalized resume fee
 
 - **Frontend:** React (Vite) + Tailwind CSS
 - **Backend:** Node.js + Express
-- **AI:** Anthropic Claude API
+- **AI:** Google Gemini API (free tier) or Anthropic Claude API
 - **Auth:** Firebase Authentication (Google Sign-in)
 - **Database:** Firebase Firestore
 - **PDF parsing:** pdf-parse
@@ -74,11 +74,14 @@ VITE_FIREBASE_APP_ID=your-app-id
 # VITE_API_URL=https://your-backend.onrender.com  # for production only
 ```
 
-2. Create `server/.env` with your Claude API key:
+2. Create `server/.env` with your API key (free option recommended):
 ```
-ANTHROPIC_API_KEY=sk-ant-...
+GEMINI_API_KEY=your-gemini-api-key
+# ANTHROPIC_API_KEY=sk-ant-...  # Claude alternative
 PORT=3001
 ```
+
+Get a free Gemini API key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 
 ### Run Locally
 

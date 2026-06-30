@@ -5,28 +5,68 @@ import multer from 'multer'
 const require = createRequire(import.meta.url)
 const pdfParse = require('pdf-parse')
 
-export const claudeRouter = Router()
+export const aiRouter = Router()
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
 
-const CLAUDE_API = 'https://api.anthropic.com/v1/messages'
-const MODEL = 'claude-sonnet-4-20250514'
+const MODEL = 'gemini-1.5-flash'
 
-function isMockMode() {
-  return !process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY === 'your-anthropic-api-key'
+function getApiKey() {
+  return process.env.GEMINI_API_KEY || process.env.ANTHROPIC_API_KEY
 }
 
-async function callClaude(systemPrompt, userMessage) {
-  if (isMockMode()) return mockResponse(systemPrompt, userMessage)
+async function callAI(systemPrompt, userMessage) {
+  const apiKey = getApiKey()
+  if (!apiKey || apiKey === 'your-api-key') {
+    return mockResponse(systemPrompt, userMessage)
+  }
 
-  const res = await fetch(CLAUDE_API, {
+  const isGemini = !!process.env.GEMINI_API_KEY
+
+  if (isGemini) {
+    return callGemini(apiKey, systemPrompt, userMessage)
+  }
+
+  return callClaude(apiKey, systemPrompt, userMessage)
+}
+
+async function callGemini(apiKey, systemPrompt, userMessage) {
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ parts: [{ text: userMessage }] }],
+        generationConfig: { maxOutputTokens: 4096, temperature: 0.7 },
+      }),
+    }
+  )
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Gemini API error: ${res.status} ${err}`)
+  }
+
+  const data = await res.json()
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+  try {
+    return JSON.parse(text.replace(/```json\s*|\s*```/g, ''))
+  } catch {
+    return { raw: text }
+  }
+}
+
+async function callClaude(apiKey, systemPrompt, userMessage) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY,
+      'x-api-key': apiKey,
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: MODEL,
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 4096,
       system: systemPrompt,
       messages: [{ role: 'user', content: userMessage }],
@@ -47,7 +87,7 @@ async function callClaude(systemPrompt, userMessage) {
   }
 }
 
-claudeRouter.post('/upload-resume', upload.single('resume'), async (req, res) => {
+aiRouter.post('/upload-resume', upload.single('resume'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
     const targetRole = req.body.targetRole
@@ -56,7 +96,7 @@ claudeRouter.post('/upload-resume', upload.single('resume'), async (req, res) =>
     const pdfData = await pdfParse(req.file.buffer)
     const text = pdfData.text.slice(0, 8000)
 
-    const result = await callClaude(
+    const result = await callAI(
       'You are an expert ATS resume analyzer. Analyze the resume and return JSON with: atsScore (0-100), missingKeywords (array), weakPoints (array), suggestions (array). Be specific and actionable.',
       `Resume:\n${text}\n\nTarget Role: ${targetRole}`
     )
@@ -66,12 +106,12 @@ claudeRouter.post('/upload-resume', upload.single('resume'), async (req, res) =>
   }
 })
 
-claudeRouter.post('/analyze-resume', async (req, res) => {
+aiRouter.post('/analyze-resume', async (req, res) => {
   try {
     const { text, targetRole } = req.body
     if (!text || !targetRole) return res.status(400).json({ error: 'Missing resume text or target role' })
     const truncated = text.slice(0, 8000)
-    const result = await callClaude(
+    const result = await callAI(
       'You are an expert ATS resume analyzer. Analyze the resume and return JSON with: atsScore (0-100), missingKeywords (array), weakPoints (array), suggestions (array). Be specific and actionable.',
       `Resume:\n${truncated}\n\nTarget Role: ${targetRole}`
     )
@@ -81,11 +121,11 @@ claudeRouter.post('/analyze-resume', async (req, res) => {
   }
 })
 
-claudeRouter.post('/generate-roadmap', async (req, res) => {
+aiRouter.post('/generate-roadmap', async (req, res) => {
   try {
     const { currentSkills, targetRole, experienceLevel } = req.body
     if (!currentSkills || !targetRole) return res.status(400).json({ error: 'Missing skills or target role' })
-    const result = await callClaude(
+    const result = await callAI(
       'You are a career roadmap generator. Return JSON with: { targetRole: string, months: array of { title, duration, items[] } }. Include specific free resources and project ideas.',
       `Current skills: ${currentSkills.join(', ')}\nTarget role: ${targetRole}\nExperience: ${experienceLevel}`
     )
@@ -95,11 +135,11 @@ claudeRouter.post('/generate-roadmap', async (req, res) => {
   }
 })
 
-claudeRouter.post('/generate-questions', async (req, res) => {
+aiRouter.post('/generate-questions', async (req, res) => {
   try {
     const { domain } = req.body
     if (!domain) return res.status(400).json({ error: 'Missing domain' })
-    const result = await callClaude(
+    const result = await callAI(
       'You are a technical interviewer. Generate 5 interview questions for the given domain. Return JSON: { questions: string[] }',
       `Domain: ${domain}`
     )
@@ -109,11 +149,11 @@ claudeRouter.post('/generate-questions', async (req, res) => {
   }
 })
 
-claudeRouter.post('/evaluate-answer', async (req, res) => {
+aiRouter.post('/evaluate-answer', async (req, res) => {
   try {
     const { question, answer, domain } = req.body
     if (!question || !answer) return res.status(400).json({ error: 'Missing question or answer' })
-    const result = await callClaude(
+    const result = await callAI(
       'You are an interview coach. Evaluate the answer and return JSON: { score (0-100), feedback (string), idealAnswer (string) }',
       `Domain: ${domain}\nQuestion: ${question}\nAnswer: ${answer}`
     )
