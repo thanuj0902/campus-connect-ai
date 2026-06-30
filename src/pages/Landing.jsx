@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 const features = [
@@ -59,7 +59,13 @@ const steps = [
 ]
 
 export default function Landing() {
-  const { user, login } = useAuth()
+  const { user, error, login } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogin = async () => {
+    const result = await login()
+    if (result?.ok) navigate('/dashboard')
+  }
 
   return (
     <div>
@@ -86,11 +92,14 @@ export default function Landing() {
                 Go to Dashboard &rarr;
               </Link>
             ) : (
-              <button onClick={login} className="btn-primary text-base px-8 py-3.5">
+              <button onClick={handleLogin} className="btn-primary text-base px-8 py-3.5">
                 Get Started Free &rarr;
               </button>
             )}
           </div>
+          {error && (
+            <p className="mt-4 text-danger text-sm bg-danger/10 px-4 py-2 rounded-lg inline-block">{error}</p>
+          )}
         </div>
       </section>
 
@@ -162,7 +171,7 @@ export default function Landing() {
               Go to Dashboard &rarr;
             </Link>
           ) : (
-            <button onClick={login} className="inline-block bg-white text-primary px-8 py-3.5 rounded-xl font-semibold hover:shadow-xl hover:shadow-white/20 transition-all cursor-pointer">
+            <button onClick={handleLogin} className="inline-block bg-white text-primary px-8 py-3.5 rounded-xl font-semibold hover:shadow-xl hover:shadow-white/20 transition-all cursor-pointer">
               Get Started Free &rarr;
             </button>
           )}

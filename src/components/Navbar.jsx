@@ -1,10 +1,16 @@
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Navbar() {
   const { user, login, logout } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
+
+  const handleLogin = async () => {
+    const result = await login()
+    if (result?.ok) navigate('/dashboard')
+  }
   const [menuOpen, setMenuOpen] = useState(false)
   const isLanding = location.pathname === '/'
 
@@ -41,7 +47,7 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
-              <button onClick={login} className="btn-primary text-sm">
+              <button onClick={handleLogin} className="btn-primary text-sm">
                 Sign in with Google
               </button>
             )}
@@ -87,7 +93,7 @@ export default function Navbar() {
                 <button onClick={() => { logout(); setMenuOpen(false) }} className="text-left text-sm text-text-muted hover:text-danger py-1">Sign out</button>
               </>
             ) : (
-              <button onClick={() => { login(); setMenuOpen(false) }} className="btn-primary text-sm text-center">Sign in with Google</button>
+              <button onClick={async () => { await handleLogin(); setMenuOpen(false) }} className="btn-primary text-sm text-center">Sign in with Google</button>
             )}
           </div>
         )}

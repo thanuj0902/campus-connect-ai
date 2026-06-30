@@ -12,6 +12,7 @@ function getMockUser() {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => (isConfigured ? null : getMockUser()))
   const [loading, setLoading] = useState(!getMockUser())
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     if (!isConfigured) {
@@ -24,11 +25,15 @@ export function AuthProvider({ children }) {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u)
       setLoading(false)
+    }, (err) => {
+      setError(err.message)
+      setLoading(false)
     })
     return unsub
   }, [])
 
   const login = async () => {
+    setError(null)
     if (!isConfigured) {
       const mockUser = {
         uid: 'mock-123',
@@ -38,9 +43,20 @@ export function AuthProvider({ children }) {
       }
       localStorage.setItem('cc_mock_user', JSON.stringify(mockUser))
       setUser(mockUser)
-      return
+      return { ok: true }
     }
-    await signInWithPopup(auth, provider)
+    try {
+      await signInWithPopup(auth, provider)
+      return { ok: true }
+    } catch (e) {
+      const msg = e.code === 'auth/popup-blocked'
+        ? 'Popup was blocked by your browser. Please allow popups for this site.'
+        : e.code === 'auth/unauthorized-domain'
+        ? 'Sign-in is not available on this domain yet. Contact the developer to add it to Firebase authorized domains.'
+        : e.message
+      setError(msg)
+      return { ok: false, error: msg }
+    }
   }
 
   const logout = async () => {
@@ -53,7 +69,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, login, logout }}>
       {children}
     </AuthContext.Provider>
   )
