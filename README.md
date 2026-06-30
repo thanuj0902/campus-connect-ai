@@ -95,6 +95,12 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173).
 
+## Live URLs
+
+- **Frontend:** [campus-connect-henna-iota.vercel.app](https://campus-connect-henna-iota.vercel.app)
+- **Backend API:** [campus-connect-ai-8ls3.onrender.com](https://campus-connect-ai-8ls3.onrender.com)
+- **Git Repo:** [github.com/thanuj0902/campus-connect-ai](https://github.com/thanuj0902/campus-connect-ai)
+
 ## Deployment
 
 - **Frontend:** Deploy to Vercel (points to `dist/` folder)
