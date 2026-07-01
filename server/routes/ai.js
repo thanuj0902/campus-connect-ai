@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import multer from 'multer'
-import { PDFParse } from 'pdf-parse'
+import { createRequire } from 'module'
+
+const require = createRequire(import.meta.url)
 
 export const aiRouter = Router()
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
@@ -108,6 +110,7 @@ aiRouter.post('/upload-resume', upload.single('resume'), async (req, res) => {
     const targetRole = req.body.targetRole
     if (!targetRole) return res.status(400).json({ error: 'Missing target role' })
 
+    const { PDFParse } = await import('pdf-parse')
     const pdf = new PDFParse(new Uint8Array(req.file.buffer))
     await pdf.load()
     const pdfResult = await pdf.getText()
