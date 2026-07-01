@@ -1,7 +1,9 @@
+import { Link } from 'react-router-dom'
+
 export default function ModuleCard({ icon, title, description, path, gradient, index = 0 }) {
   return (
-    <a
-      href={path}
+    <Link
+      to={path}
       className="card card-hover p-6 fade-in group"
       style={{ animationDelay: `${index * 0.1}s` }}
     >
@@ -10,6 +12,6 @@ export default function ModuleCard({ icon, title, description, path, gradient, i
       </div>
       <h3 className="font-semibold text-lg mb-1.5 group-hover:text-primary transition-colors">{title}</h3>
       <p className="text-text-muted text-sm leading-relaxed">{description}</p>
-    </a>
+    </Link>
   )
 }

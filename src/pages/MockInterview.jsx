@@ -14,9 +14,11 @@ export default function MockInterview() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const chatEnd = useRef(null)
+  const timeoutRef = useRef(null)
 
   useEffect(() => {
     chatEnd.current?.scrollIntoView({ behavior: 'smooth' })
+    return () => clearTimeout(timeoutRef.current)
   }, [chat])
 
   const startInterview = async () => {
@@ -48,16 +50,16 @@ export default function MockInterview() {
       setChat((prev) => [
         ...prev,
         { role: 'ai', text: data.feedback || 'Good effort!' },
-        ...(data.idealAnswer ? [{ role: 'ai', text: `Ideal answer: ${data.idealAnswer}` }] : []),
+        ...(data.idealAnswer ? [{ role: 'ai', type: 'ideal', text: `Ideal answer: ${data.idealAnswer}` }] : []),
       ])
       setResults((prev) => [...prev, { question: q, score: data.score || 0 }])
       setAnswer('')
       const next = currentQ + 1
       if (next < questions.length) {
         setCurrentQ(next)
-        setTimeout(() => setChat((prev) => [...prev, { role: 'ai', text: questions[next] }]), 300)
+        timeoutRef.current = setTimeout(() => setChat((prev) => [...prev, { role: 'ai', text: questions[next] }]), 300)
       } else {
-        setTimeout(() => setStage('completed'), 500)
+        timeoutRef.current = setTimeout(() => setStage('completed'), 500)
       }
     } catch (e) {
       setError(e.message || 'Failed to evaluate answer.')
@@ -158,7 +160,7 @@ export default function MockInterview() {
             <div className={`max-w-[80%] p-3.5 rounded-2xl text-sm leading-relaxed ${
               msg.role === 'user'
                 ? 'gradient-primary text-white rounded-br-md'
-                : msg.text.startsWith('Ideal answer')
+                : (msg.type === 'ideal' || msg.text.startsWith('Ideal answer'))
                   ? 'bg-amber-50 text-amber-800 border border-amber-200 rounded-bl-md'
                   : 'bg-surface-alt text-text rounded-bl-md'
             }`}>

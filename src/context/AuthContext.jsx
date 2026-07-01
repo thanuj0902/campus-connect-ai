@@ -65,7 +65,11 @@ export function AuthProvider({ children }) {
       setUser(null)
       return
     }
-    await signOut(auth)
+    try {
+      await signOut(auth)
+    } catch {
+      // ignore logout errors
+    }
   }
 
   return (

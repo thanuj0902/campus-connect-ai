@@ -1,5 +1,5 @@
 let API_BASE = import.meta.env.VITE_API_URL || '/api'
-if (API_BASE !== '/api' && !API_BASE.endsWith('/api')) {
+if (API_BASE !== '/api' && !API_BASE.match(/\/api\/?$/)) {
   API_BASE = API_BASE.replace(/\/+$/, '') + '/api'
 }
 

@@ -1,11 +1,12 @@
 export default function ScoreGauge({ score, label }) {
+  const val = score ?? 0
   const getColor = (s) => {
     if (s >= 80) return 'text-success'
     if (s >= 50) return 'text-warning'
     return 'text-danger'
   }
   const circumference = 2 * Math.PI * 54
-  const offset = circumference - (score / 100) * circumference
+  const offset = circumference - (val / 100) * circumference
 
   return (
     <div className="flex flex-col items-center">
@@ -19,14 +20,14 @@ export default function ScoreGauge({ score, label }) {
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          className={getColor(score)}
+          className={getColor(val)}
         />
       </svg>
       <div className="absolute mt-10">
-        <span className={`text-3xl font-bold ${getColor(score)}`}>{score}</span>
+        <span className={`text-3xl font-bold ${getColor(val)}`}>{val}</span>
         <span className="text-text-muted text-sm">/100</span>
       </div>
-      {label && <p className="text-text-muted text-sm mt-12">{label}</p>}
+      {label ? <p className="text-text-muted text-sm mt-12">{label}</p> : null}
     </div>
   )
 }

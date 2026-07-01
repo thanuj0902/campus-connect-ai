@@ -39,6 +39,7 @@ export default function Navbar() {
                     src={user.photoURL}
                     alt=""
                     className="w-8 h-8 rounded-full ring-2 ring-transparent group-hover:ring-primary/30 transition-all"
+                    onError={(e) => { e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%236366f1"/><text x="16" y="21" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif">?</text></svg>' }}
                   />
                   <span className="font-medium">{user.displayName}</span>
                 </Link>
@@ -75,7 +76,7 @@ export default function Navbar() {
         </div>
 
         {menuOpen && (
-          <div className="md:hidden relative bg-white rounded-2xl shadow-xl border border-border mt-2 p-4 flex flex-col gap-3 animate-fade-in">
+          <div className="md:hidden relative bg-white rounded-2xl shadow-xl border border-border mt-2 p-4 flex flex-col gap-3 fade-in">
             {!isLanding && (
               <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="text-text-muted hover:text-primary py-2 text-sm font-medium">
                 Dashboard
@@ -84,7 +85,7 @@ export default function Navbar() {
             {user ? (
               <>
                 <div className="flex items-center gap-3 py-2 border-b border-border">
-                  <img src={user.photoURL} alt="" className="w-8 h-8 rounded-full" />
+                  <img src={user.photoURL} alt="" className="w-8 h-8 rounded-full" onError={(e) => { e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%236366f1"/><text x="16" y="21" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif">?</text></svg>' }} />
                   <div>
                     <p className="text-sm font-medium">{user.displayName}</p>
                     <p className="text-xs text-text-muted">{user.email}</p>

@@ -16,7 +16,7 @@ export default function Opportunities() {
       return { ...opp, score: overlap }
     })
     scored.sort((a, b) => b.score - a.score)
-    setMatches(scored.slice(0, 5))
+    setMatches(scored.filter((m) => m.score > 0).slice(0, 5))
     setSearched(true)
   }
 

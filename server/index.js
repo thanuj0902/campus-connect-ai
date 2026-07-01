@@ -13,6 +13,13 @@ app.use('/api/claude', aiRouter)
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }))
 
+app.use((_req, res) => res.status(404).json({ error: 'Not found' }))
+
+app.use((err, _req, res, _next) => {
+  console.error(err)
+  res.status(500).json({ error: 'Internal server error' })
+})
+
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)

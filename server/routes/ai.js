@@ -33,58 +33,75 @@ async function callAI(systemPrompt, userMessage) {
 }
 
 async function callGemini(apiKey, systemPrompt, userMessage) {
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: `${systemPrompt}\n\n${userMessage}` }] }],
-        generationConfig: { maxOutputTokens: 4096, temperature: 0.7 },
-      }),
-    }
-  )
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 30000)
 
-  if (!res.ok) {
-    return mockResponse(systemPrompt, userMessage)
-  }
-
-  const data = await res.json()
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
   try {
-    return JSON.parse(text.replace(/```json\s*|\s*```/g, ''))
-  } catch {
-    return { raw: text }
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${apiKey}`,
+      {
+        signal: controller.signal,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: `${systemPrompt}\n\n${userMessage}` }] }],
+          generationConfig: { maxOutputTokens: 4096, temperature: 0.7 },
+        }),
+      }
+    )
+
+    if (!res.ok) {
+      const err = await res.text()
+      throw new Error(`Gemini API error: ${res.status} ${err}`)
+    }
+
+    const data = await res.json()
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+    try {
+      return JSON.parse(text.replace(/```json\s*|\s*```/g, ''))
+    } catch {
+      return { raw: text }
+    }
+  } finally {
+    clearTimeout(timeout)
   }
 }
 
 async function callClaude(apiKey, systemPrompt, userMessage) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userMessage }],
-    }),
-  })
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 30000)
 
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`Claude API error: ${res.status} ${err}`)
-  }
-
-  const data = await res.json()
-  const text = data.content?.[0]?.text || ''
   try {
-    return JSON.parse(text)
-  } catch {
-    return { raw: text }
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      signal: controller.signal,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMessage }],
+      }),
+    })
+
+    if (!res.ok) {
+      const err = await res.text()
+      throw new Error(`Claude API error: ${res.status} ${err}`)
+    }
+
+    const data = await res.json()
+    const text = data.content?.[0]?.text || ''
+    try {
+      return JSON.parse(text.replace(/```json\s*|\s*```/g, ''))
+    } catch {
+      return { raw: text }
+    }
+  } finally {
+    clearTimeout(timeout)
   }
 }
 
