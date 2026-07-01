@@ -1,9 +1,6 @@
-import { createRequire } from 'module'
 import { Router } from 'express'
 import multer from 'multer'
-
-const require = createRequire(import.meta.url)
-const pdfParse = require('pdf-parse')
+import { PDFParse } from 'pdf-parse'
 
 export const aiRouter = Router()
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
@@ -111,8 +108,10 @@ aiRouter.post('/upload-resume', upload.single('resume'), async (req, res) => {
     const targetRole = req.body.targetRole
     if (!targetRole) return res.status(400).json({ error: 'Missing target role' })
 
-    const pdfData = await pdfParse(req.file.buffer)
-    const text = pdfData.text.slice(0, 8000)
+    const pdf = new PDFParse(new Uint8Array(req.file.buffer))
+    await pdf.load()
+    const text = (await pdf.getText()).slice(0, 8000)
+    pdf.destroy()
 
     const result = await callAI(
       'You are an expert ATS resume analyzer. Analyze the resume and return JSON with: atsScore (0-100), missingKeywords (array), weakPoints (array), suggestions (array). Be specific and actionable.',
