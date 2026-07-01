@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import rateLimit from 'express-rate-limit'
 import { aiRouter } from './routes/ai.js'
 
 dotenv.config()
@@ -8,6 +9,13 @@ dotenv.config()
 const app = express()
 app.use(cors())
 app.use(express.json({ limit: '10mb' }))
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  message: { error: 'Too many requests. Try again in a minute.' }
+})
+app.use('/api/claude', limiter)
 
 app.use('/api/claude', aiRouter)
 
