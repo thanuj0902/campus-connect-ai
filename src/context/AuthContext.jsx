@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth'
+import { onAuthStateChanged, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth'
 import { auth, provider, isConfigured } from '../services/firebase'
 
 const AuthContext = createContext(null)
@@ -59,6 +59,59 @@ export function AuthProvider({ children }) {
     }
   }
 
+  const loginWithEmail = async (email, password) => {
+    setError(null)
+    if (!isConfigured) {
+      const mockUser = {
+        uid: 'mock-' + Date.now(),
+        displayName: email.split('@')[0],
+        email,
+        photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + email,
+      }
+      localStorage.setItem('cc_mock_user', JSON.stringify(mockUser))
+      setUser(mockUser)
+      return { ok: true }
+    }
+    try {
+      await signInWithEmailAndPassword(auth, email, password)
+      return { ok: true }
+    } catch (e) {
+      const msg = e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential'
+        ? 'Invalid email or password'
+        : e.message
+      setError(msg)
+      return { ok: false, error: msg }
+    }
+  }
+
+  const register = async (email, password, name) => {
+    setError(null)
+    if (!isConfigured) {
+      const mockUser = {
+        uid: 'mock-' + Date.now(),
+        displayName: name || email.split('@')[0],
+        email,
+        photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + email,
+      }
+      localStorage.setItem('cc_mock_user', JSON.stringify(mockUser))
+      setUser(mockUser)
+      return { ok: true }
+    }
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, password)
+      if (name) await updateProfile(cred.user, { displayName: name })
+      return { ok: true }
+    } catch (e) {
+      const msg = e.code === 'auth/email-already-in-use'
+        ? 'This email is already registered'
+        : e.code === 'auth/weak-password'
+        ? 'Password should be at least 6 characters'
+        : e.message
+      setError(msg)
+      return { ok: false, error: msg }
+    }
+  }
+
   const logout = async () => {
     if (!isConfigured) {
       localStorage.removeItem('cc_mock_user')
@@ -73,7 +126,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, login, loginWithEmail, register, logout }}>
       {children}
     </AuthContext.Provider>
   )
