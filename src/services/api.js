@@ -1,4 +1,7 @@
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+let API_BASE = import.meta.env.VITE_API_URL || '/api'
+if (API_BASE !== '/api' && !API_BASE.endsWith('/api')) {
+  API_BASE = API_BASE.replace(/\/+$/, '') + '/api'
+}
 
 async function fetchFromClaude(endpoint, body) {
   const res = await fetch(`${API_BASE}/claude/${endpoint}`, {
