@@ -59,8 +59,11 @@ export default function Navbar() {
                 <button onClick={handleLogin} className="btn-primary text-sm">
                   Sign in with Google
                 </button>
-                <button onClick={() => { setShowAuthForm(true); setAuthMode('login'); setAuthError('') }} className="btn-secondary text-sm">
-                  Email
+                <button onClick={() => { setShowAuthForm(true); setAuthMode('signup'); setAuthError('') }} className="btn-secondary text-sm">
+                  Sign Up
+                </button>
+                <button onClick={() => { setShowAuthForm(true); setAuthMode('login'); setAuthError('') }} className="text-sm text-text-muted hover:text-primary transition-colors font-medium">
+                  Log In
                 </button>
               </div>
             )}
@@ -108,7 +111,8 @@ export default function Navbar() {
             ) : (
               <div className="flex flex-col gap-2">
                 <button onClick={async () => { await handleLogin(); setMenuOpen(false) }} className="btn-primary text-sm text-center">Sign in with Google</button>
-                <button onClick={() => { setShowAuthForm(true); setAuthMode('login'); setMenuOpen(false) }} className="btn-secondary text-sm text-center">Sign in with Email</button>
+                <button onClick={() => { setShowAuthForm(true); setAuthMode('signup'); setMenuOpen(false) }} className="btn-secondary text-sm text-center">Sign Up</button>
+                <button onClick={() => { setShowAuthForm(true); setAuthMode('login'); setMenuOpen(false) }} className="text-sm text-text-muted hover:text-primary py-1">Log In</button>
               </div>
             )}
           </div>
@@ -118,12 +122,12 @@ export default function Navbar() {
       {showAuthForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 fade-in" onClick={() => setShowAuthForm(false)}>
           <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-xl font-bold mb-1">{authMode === 'login' ? 'Sign In' : 'Create Account'}</h2>
+            <h2 className="text-xl font-bold mb-1">{authMode === 'login' ? 'Log In' : 'Create Account'}</h2>
             <p className="text-sm text-text-muted mb-5">
               {authMode === 'login' ? 'Sign in with your email' : 'Create a new account'}
             </p>
 
-            {authMode === 'register' && (
+            {authMode === 'signup' && (
               <input
                 type="text"
                 placeholder="Your name"
@@ -154,7 +158,7 @@ export default function Navbar() {
                 setAuthLoading(true)
                 setAuthError('')
                 const fn = authMode === 'login' ? loginWithEmail : register
-                const args = authMode === 'register' ? [authEmail, authPassword, authName] : [authEmail, authPassword]
+                const args = authMode === 'signup' ? [authEmail, authPassword, authName] : [authEmail, authPassword]
                 const result = await fn(...args)
                 setAuthLoading(false)
                 if (result?.ok) {
@@ -170,12 +174,12 @@ export default function Navbar() {
               disabled={!authEmail || !authPassword || authLoading}
               className="btn-primary w-full mb-3"
             >
-              {authLoading ? 'Please wait...' : authMode === 'login' ? 'Sign In' : 'Create Account'}
+              {authLoading ? 'Please wait...' : authMode === 'login' ? 'Log In' : 'Create Account'}
             </button>
 
             <p className="text-sm text-center text-text-muted">
               {authMode === 'login' ? (
-                <>Don't have an account? <button onClick={() => { setAuthMode('register'); setAuthError('') }} className="text-primary font-medium hover:underline">Sign up</button></>
+                <>Don't have an account? <button onClick={() => { setAuthMode('signup'); setAuthError('') }} className="text-primary font-medium hover:underline">Sign up</button></>
               ) : (
                 <>Already have an account? <button onClick={() => { setAuthMode('login'); setAuthError('') }} className="text-primary font-medium hover:underline">Sign in</button></>
               )}
