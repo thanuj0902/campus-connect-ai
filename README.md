@@ -17,7 +17,7 @@ AI-powered career co-pilot for engineering students. Get personalized resume fee
 
 - **Frontend:** React (Vite) + Tailwind CSS
 - **Backend:** Node.js + Express
-- **AI:** Google Gemini API (free tier) or Anthropic Claude API
+- **AI:** Google Gemini API (free tier)
 - **Auth:** Firebase Authentication (Google Sign-in)
 - **Database:** Firebase Firestore
 - **PDF parsing:** pdf-parse
@@ -34,7 +34,7 @@ campus-connect-ai/
 │   └── data/         # Sample opportunity data
 ├── server/
 │   ├── index.js      # Express server
-│   └── routes/       # Claude API proxy routes
+│   └── routes/       # AI API proxy routes
 ├── .env              # Frontend env vars (Firebase)
 └── vite.config.js    # Vite config with Tailwind + proxy
 ```
@@ -44,7 +44,7 @@ campus-connect-ai/
 ### Prerequisites
 
 - Node.js 18+
-- Anthropic Claude API key
+- Google Gemini API key (free — get one at [aistudio.google.com/apikey](https://aistudio.google.com/apikey))
 - Firebase project (for auth — optional, app works without it)
 
 ### Installation
@@ -74,10 +74,9 @@ VITE_FIREBASE_APP_ID=your-app-id
 # VITE_API_URL=https://campus-connect-ai-8ls3.onrender.com/api  # for production only
 ```
 
-2. Create `server/.env` with your API key (free option recommended):
+2. Create `server/.env` with your API key:
 ```
 GEMINI_API_KEY=your-gemini-api-key
-# ANTHROPIC_API_KEY=sk-ant-...  # Claude alternative
 PORT=3001
 ```
 
