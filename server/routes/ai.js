@@ -110,8 +110,8 @@ aiRouter.post('/upload-resume', upload.single('resume'), async (req, res) => {
 
     const pdf = new PDFParse(new Uint8Array(req.file.buffer))
     await pdf.load()
-    const result = await pdf.getText()
-    const text = result.text.slice(0, 8000)
+    const pdfResult = await pdf.getText()
+    const text = pdfResult.text.slice(0, 8000)
     pdf.destroy()
 
     const result = await callAI(
