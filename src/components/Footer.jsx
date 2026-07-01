@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom'
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border/50 relative overflow-hidden">
-      <div className="absolute inset-0 bg-white/50 backdrop-blur-sm" />
+    <footer className="border-t border-[var(--border-color)] relative overflow-hidden">
+      <div className="absolute inset-0 bg-[var(--bg-card)]/50 backdrop-blur-sm" />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
       <div className="relative max-w-7xl mx-auto px-4 py-10">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -13,7 +13,7 @@ export default function Footer() {
             </span>
             <span className="gradient-text">CampusConnect AI</span>
           </Link>
-          <p className="text-text-muted text-sm">
+          <p className="text-[var(--text-muted)] text-sm">
             &copy; {new Date().getFullYear()} CampusConnect AI &mdash; Built for engineering students
           </p>
         </div>

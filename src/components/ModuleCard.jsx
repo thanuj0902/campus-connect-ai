@@ -11,7 +11,7 @@ export default function ModuleCard({ icon, title, description, path, gradient, i
         {icon}
       </div>
       <h3 className="font-semibold text-lg mb-1.5 group-hover:text-primary transition-colors">{title}</h3>
-      <p className="text-text-muted text-sm leading-relaxed">{description}</p>
+      <p className="text-[var(--text-muted)] text-sm leading-relaxed">{description}</p>
     </Link>
   )
 }

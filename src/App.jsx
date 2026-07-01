@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -10,20 +11,38 @@ import MockInterview from './pages/MockInterview'
 import Opportunities from './pages/Opportunities'
 import Profile from './pages/Profile'
 
-export default function App() {
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } },
+  exit: { opacity: 0, y: -10, transition: { duration: 0.2 } },
+}
+
+function AnimatedPage({ children }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" className="theme-transition">
+      {children}
+    </motion.div>
+  )
+}
+
+export default function App() {
+  const location = useLocation()
+
+  return (
+    <div className="min-h-screen flex flex-col theme-transition">
       <Navbar />
       <main className="flex-1">
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/resume-analyzer" element={<ProtectedRoute><ResumeAnalyzer /></ProtectedRoute>} />
-          <Route path="/roadmap" element={<ProtectedRoute><RoadmapGenerator /></ProtectedRoute>} />
-          <Route path="/mock-interview" element={<ProtectedRoute><MockInterview /></ProtectedRoute>} />
-          <Route path="/opportunities" element={<ProtectedRoute><Opportunities /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        </Routes>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<AnimatedPage><Landing /></AnimatedPage>} />
+            <Route path="/dashboard" element={<AnimatedPage><ProtectedRoute><Dashboard /></ProtectedRoute></AnimatedPage>} />
+            <Route path="/resume-analyzer" element={<AnimatedPage><ProtectedRoute><ResumeAnalyzer /></ProtectedRoute></AnimatedPage>} />
+            <Route path="/roadmap" element={<AnimatedPage><ProtectedRoute><RoadmapGenerator /></ProtectedRoute></AnimatedPage>} />
+            <Route path="/mock-interview" element={<AnimatedPage><ProtectedRoute><MockInterview /></ProtectedRoute></AnimatedPage>} />
+            <Route path="/opportunities" element={<AnimatedPage><ProtectedRoute><Opportunities /></ProtectedRoute></AnimatedPage>} />
+            <Route path="/profile" element={<AnimatedPage><ProtectedRoute><Profile /></ProtectedRoute></AnimatedPage>} />
+          </Routes>
+        </AnimatePresence>
       </main>
       <Footer />
     </div>
