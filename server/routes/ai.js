@@ -1,8 +1,5 @@
 import { Router } from 'express'
 import multer from 'multer'
-import { createRequire } from 'module'
-
-const require = createRequire(import.meta.url)
 
 export const aiRouter = Router()
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
