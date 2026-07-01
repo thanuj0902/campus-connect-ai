@@ -27,7 +27,7 @@ export default function Opportunities() {
         <p className="text-text-muted text-lg mb-8">Discover internships and hackathons that match your skill set.</p>
       </div>
 
-      <div className="card p-6 mb-8 fade-in fade-in-delay-1">
+      <div className="glass-card rounded-2xl p-6 mb-8 fade-in fade-in-delay-1">
         <label className="block text-sm font-medium mb-1.5 text-text-muted">Your Skills</label>
         <div className="flex gap-2">
           <input
@@ -68,7 +68,7 @@ export default function Opportunities() {
               href={opp.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="card card-hover p-5 fade-in"
+              className="glass-card rounded-2xl p-5 fade-in-up group"
               style={{ animationDelay: `${i * 0.08}s` }}
             >
               <div className="flex items-start justify-between mb-3">
@@ -79,7 +79,7 @@ export default function Opportunities() {
                   </span>
                 )}
               </div>
-              <h3 className="font-semibold mb-1">{opp.title}</h3>
+              <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">{opp.title}</h3>
               <p className="text-xs text-text-muted mb-3">Deadline: {opp.deadline}</p>
               <div className="flex flex-wrap gap-1.5">
                 {opp.skills.map((skill) => (

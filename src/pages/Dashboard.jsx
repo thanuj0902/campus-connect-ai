@@ -59,7 +59,7 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
-      <div className="mb-10 fade-in">
+      <div className="glass-card rounded-2xl p-8 mb-10 fade-in">
         <h1 className="text-3xl sm:text-4xl font-bold">
           Welcome back, <span className="gradient-text">{user?.displayName?.split(' ')[0] || 'Student'}</span>
         </h1>

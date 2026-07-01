@@ -33,7 +33,7 @@ export default function ResumeAnalyzer() {
         <p className="text-text-muted text-lg mb-8">Upload your PDF resume and get instant AI-powered feedback.</p>
       </div>
 
-      <div className="card p-6 mb-8 fade-in fade-in-delay-1">
+      <div className="glass-card rounded-2xl p-6 mb-8 fade-in fade-in-delay-1">
         <div className="grid sm:grid-cols-2 gap-4 mb-5">
           <div>
             <label className="block text-sm font-medium mb-1.5 text-text-muted">Upload Resume (PDF)</label>
@@ -82,12 +82,12 @@ export default function ResumeAnalyzer() {
 
       {result && (
         <div className="space-y-5 fade-in">
-          <div className="card p-6 flex flex-col items-center">
+          <div className="glass-card rounded-2xl p-6 flex flex-col items-center">
             <ScoreGauge score={result.atsScore} label="ATS Score" />
           </div>
 
           {result.missingKeywords?.length > 0 && (
-            <div className="card p-6">
+            <div className="glass-card rounded-2xl p-6">
               <h3 className="font-semibold text-lg mb-3">Missing Keywords</h3>
               <div className="flex flex-wrap gap-2">
                 {result.missingKeywords.map((kw) => (
@@ -98,7 +98,7 @@ export default function ResumeAnalyzer() {
           )}
 
           {result.weakPoints?.length > 0 && (
-            <div className="card p-6">
+            <div className="glass-card rounded-2xl p-6">
               <h3 className="font-semibold text-lg mb-3">Areas to Improve</h3>
               <ul className="space-y-3">
                 {result.weakPoints.map((p, i) => (
@@ -112,7 +112,7 @@ export default function ResumeAnalyzer() {
           )}
 
           {result.suggestions?.length > 0 && (
-            <div className="card p-6">
+            <div className="glass-card rounded-2xl p-6">
               <h3 className="font-semibold text-lg mb-3">Suggestions</h3>
               <ul className="space-y-3">
                 {result.suggestions.map((s, i) => (

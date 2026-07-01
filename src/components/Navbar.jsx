@@ -23,11 +23,12 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50">
-      <div className="absolute inset-0 bg-white/80 backdrop-blur-xl border-b border-white/20" />
+      <div className="absolute inset-0 glass-strong" />
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <Link to="/" className="flex items-center gap-2.5 font-bold text-xl">
-            <span className="w-8 h-8 gradient-accent rounded-lg flex items-center justify-center text-white text-sm font-bold">
+            <span className="w-8 h-8 gradient-accent rounded-lg flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-primary/20">
               C
             </span>
             <span className="gradient-text">CampusConnect AI</span>
@@ -91,7 +92,7 @@ export default function Navbar() {
         </div>
 
         {menuOpen && (
-          <div className="md:hidden relative bg-white rounded-2xl shadow-xl border border-border mt-2 p-4 flex flex-col gap-3 fade-in">
+          <div className="md:hidden relative glass-card rounded-2xl mt-2 p-4 flex flex-col gap-3 fade-in border border-white/30 shadow-xl">
             {!isLanding && (
               <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="text-text-muted hover:text-primary py-2 text-sm font-medium">
                 Dashboard
@@ -99,7 +100,7 @@ export default function Navbar() {
             )}
             {user ? (
               <>
-                <div className="flex items-center gap-3 py-2 border-b border-border">
+                <div className="flex items-center gap-3 py-2 border-b border-border/50">
                   <img src={user.photoURL} alt="" className="w-8 h-8 rounded-full" onError={(e) => { e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%236366f1"/><text x="16" y="21" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif">?</text></svg>' }} />
                   <div>
                     <p className="text-sm font-medium">{user.displayName}</p>
@@ -120,8 +121,8 @@ export default function Navbar() {
       </div>
 
       {showAuthForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 fade-in" onClick={() => setShowAuthForm(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm fade-in" onClick={() => setShowAuthForm(false)}>
+          <div className="glass-card rounded-2xl p-6 w-full max-w-sm mx-4 border border-white/30" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-1">{authMode === 'login' ? 'Log In' : 'Create Account'}</h2>
             <p className="text-sm text-text-muted mb-5">
               {authMode === 'login' ? 'Sign in with your email' : 'Create a new account'}

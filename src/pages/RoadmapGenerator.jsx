@@ -34,7 +34,7 @@ export default function RoadmapGenerator() {
         <p className="text-text-muted text-lg mb-8">Get a personalized month-by-month learning plan for your dream role.</p>
       </div>
 
-      <div className="card p-6 mb-8 fade-in fade-in-delay-1">
+      <div className="glass-card rounded-2xl p-6 mb-8 fade-in fade-in-delay-1">
         <div className="grid sm:grid-cols-2 gap-4 mb-5">
           <div className="sm:col-span-2">
             <label className="block text-sm font-medium mb-1.5 text-text-muted">Current Skills</label>
@@ -95,7 +95,7 @@ export default function RoadmapGenerator() {
           </h2>
           <div className="relative pl-8 before:absolute before:left-[15px] before:top-3 before:bottom-3 before:w-0.5 before:bg-gradient-to-b before:from-primary/30 before:to-accent/30">
             {roadmap.months.map((month, idx) => (
-              <details key={idx} className="card mb-3 group open:border-primary/30 open:shadow-md transition-all overflow-hidden">
+              <details key={idx} className="glass-card rounded-2xl mb-3 group open:border-primary/30 open:shadow-md transition-all overflow-hidden">
                 <summary className="p-4 font-semibold cursor-pointer list-none flex items-center gap-3 hover:text-primary transition-colors">
                   <span className="w-8 h-8 gradient-primary text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0 shadow-md">
                     {idx + 1}
