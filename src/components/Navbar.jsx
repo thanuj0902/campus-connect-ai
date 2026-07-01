@@ -3,16 +3,21 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import { useToast } from '../context/ToastContext'
 
 export default function Navbar() {
   const { user, login, loginWithEmail, register, logout } = useAuth()
   const { dark, toggle } = useTheme()
+  const { addToast } = useToast()
   const location = useLocation()
   const navigate = useNavigate()
 
   const handleLogin = async () => {
     const result = await login()
-    if (result?.ok) navigate('/dashboard')
+    if (result?.ok) {
+      addToast('Signed in successfully!', 'success')
+      navigate('/dashboard')
+    }
   }
   const [menuOpen, setMenuOpen] = useState(false)
   const [showAuthForm, setShowAuthForm] = useState(false)
@@ -69,7 +74,7 @@ export default function Navbar() {
                   />
                   <span className="font-medium">{user.displayName}</span>
                 </Link>
-                <button onClick={logout} className="text-sm text-[var(--text-muted)] hover:text-danger transition-colors font-medium">
+                <button onClick={() => { logout(); addToast('Signed out', 'info') }} className="text-sm text-[var(--text-muted)] hover:text-danger transition-colors font-medium">
                   Sign out
                 </button>
               </div>
@@ -138,7 +143,7 @@ export default function Navbar() {
                       <p className="text-xs text-[var(--text-muted)]">{user.email}</p>
                     </div>
                   </div>
-                  <button onClick={() => { logout(); setMenuOpen(false) }} className="text-left text-sm text-[var(--text-muted)] hover:text-danger py-1">Sign out</button>
+                  <button onClick={() => { logout(); addToast('Signed out', 'info'); setMenuOpen(false) }} className="text-left text-sm text-[var(--text-muted)] hover:text-danger py-1">Sign out</button>
                 </>
               ) : (
                 <div className="flex flex-col gap-2">
@@ -191,6 +196,7 @@ export default function Navbar() {
                   const result = await fn(...args)
                   setAuthLoading(false)
                   if (result?.ok) {
+                    addToast(authMode === 'login' ? 'Logged in successfully!' : 'Account created!', 'success')
                     setShowAuthForm(false)
                     setAuthEmail('')
                     setAuthPassword('')

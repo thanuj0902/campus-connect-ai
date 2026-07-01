@@ -13,7 +13,7 @@ const opportunities = [
     type: 'Mentorship Program',
     skills: ['React', 'Node.js', 'Azure', 'TypeScript'],
     link: 'https://microsoft.com/engage',
-    deadline: 'May 2026',
+    deadline: 'March 2026',
   },
   {
     id: 3,
@@ -37,7 +37,7 @@ const opportunities = [
     type: 'Internship',
     skills: ['Java', 'Python', 'Algorithms', 'SQL'],
     link: 'https://amazon.com/futureengineer',
-    deadline: 'January 2026',
+    deadline: 'October 2026',
   },
   {
     id: 6,
@@ -101,7 +101,7 @@ const opportunities = [
     type: 'Program',
     skills: ['React', 'Python', 'Data Structures', 'Mobile'],
     link: 'https://meta.com/university',
-    deadline: 'January 2026',
+    deadline: 'January 2027',
   },
   {
     id: 14,
