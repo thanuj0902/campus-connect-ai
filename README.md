@@ -94,9 +94,14 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173).
 
-## Live URLs
+## Try It Live
 
-- **Frontend:** [campus-connect-ai-zeta.vercel.app](https://campus-connect-ai-zeta.vercel.app)
+No setup required — just visit the frontend:
+
+- **Frontend:** [campus-connect-ai-zeta.vercel.app](https://campus-connect-ai-zeta.vercel.app) — Sign in with Google or Email/Password and use all features instantly
+
+## Live URLs (for developers)
+
 - **Backend API:** [campus-connect-ai-8ls3.onrender.com](https://campus-connect-ai-8ls3.onrender.com)
 - **Git Repo:** [github.com/thanuj0902/campus-connect-ai](https://github.com/thanuj0902/campus-connect-ai)
 
