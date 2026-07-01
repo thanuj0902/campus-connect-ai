@@ -71,7 +71,7 @@ VITE_FIREBASE_PROJECT_ID=your-project-id
 VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
 VITE_FIREBASE_APP_ID=your-app-id
-# VITE_API_URL=https://your-backend.onrender.com  # for production only
+# VITE_API_URL=https://campus-connect-ai-8ls3.onrender.com/api  # for production only
 ```
 
 2. Create `server/.env` with your API key (free option recommended):
@@ -97,7 +97,7 @@ Open [http://localhost:5173](http://localhost:5173).
 
 ## Live URLs
 
-- **Frontend:** [campus-connect-henna-iota.vercel.app](https://campus-connect-henna-iota.vercel.app)
+- **Frontend:** [campus-connect-ai-zeta.vercel.app](https://campus-connect-ai-zeta.vercel.app)
 - **Backend API:** [campus-connect-ai-8ls3.onrender.com](https://campus-connect-ai-8ls3.onrender.com)
 - **Git Repo:** [github.com/thanuj0902/campus-connect-ai](https://github.com/thanuj0902/campus-connect-ai)
 
