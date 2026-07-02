@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { generateRoadmap } from '../services/api'
+import { saveResult } from '../services/history'
 import LoadingSpinner from '../components/LoadingSpinner'
 import EmptyState from '../components/EmptyState'
 
@@ -11,15 +12,21 @@ export default function RoadmapGenerator() {
   const [roadmap, setRoadmap] = useState(null)
   const [error, setError] = useState('')
 
-  const handleGenerate = async () => {
-    if (!skills || !targetRole) return
+  const handleGenerate = async (demoSkills, demoRole) => {
+    const s = demoSkills || skills
+    const r = demoRole || targetRole
+    const e = experience
+    if (!s || !r) return
     setLoading(true)
     setError('')
     setRoadmap(null)
+    if (demoSkills) setSkills(demoSkills)
+    if (demoRole) setTargetRole(demoRole)
     try {
-      const skillsList = skills.split(',').map((s) => s.trim()).filter(Boolean)
-      const data = await generateRoadmap(skillsList, targetRole, experience)
+      const skillsList = s.split(',').map((s) => s.trim()).filter(Boolean)
+      const data = await generateRoadmap(skillsList, r, e)
       setRoadmap(data)
+      saveResult('roadmap', { targetRole: r })
     } catch (e) {
       setError(e.message || 'Failed to generate roadmap.')
     } finally {
@@ -69,9 +76,14 @@ export default function RoadmapGenerator() {
             </select>
           </div>
         </div>
-        <button onClick={handleGenerate} disabled={!skills || !targetRole || loading} className="btn-primary">
-          {loading ? 'Generating...' : 'Generate Roadmap'}
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button onClick={() => handleGenerate()} disabled={!skills || !targetRole || loading} className="btn-primary">
+            {loading ? 'Generating...' : 'Generate Roadmap'}
+          </button>
+          <button onClick={() => handleGenerate('JavaScript, Python, React', 'Full Stack Developer')} disabled={loading} className="btn-secondary">
+            Try Demo
+          </button>
+        </div>
       </div>
 
       {loading && <LoadingSpinner size="lg" />}
@@ -84,15 +96,20 @@ export default function RoadmapGenerator() {
         <EmptyState
           icon={<svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>}
           title="No roadmap yet"
-          description="Enter your current skills and target role to generate a personalized learning plan."
+          description="Enter your current skills or click 'Try Demo' to see a sample roadmap."
         />
       )}
 
       {roadmap?.months && (
         <div className="space-y-3 fade-in">
-          <h2 className="text-xl font-bold mb-4">
-            Your <span className="gradient-text">{roadmap.targetRole}</span> Roadmap
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">
+              Your <span className="gradient-text">{roadmap.targetRole}</span> Roadmap
+            </h2>
+            <button onClick={() => window.print()} className="text-sm text-primary hover:underline font-medium">
+              Export
+            </button>
+          </div>
           <div className="relative pl-8 before:absolute before:left-[15px] before:top-3 before:bottom-3 before:w-0.5 before:bg-gradient-to-b before:from-primary/30 before:to-accent/30">
             {roadmap.months.map((month, idx) => (
               <details key={idx} className="glass-card rounded-2xl mb-3 group open:border-primary/30 open:shadow-md transition-all overflow-hidden">

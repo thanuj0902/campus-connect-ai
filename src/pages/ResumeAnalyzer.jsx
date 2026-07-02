@@ -1,8 +1,15 @@
 import { useState } from 'react'
-import { uploadResume } from '../services/api'
+import { uploadResume, analyzeResume } from '../services/api'
+import { saveResult } from '../services/history'
 import LoadingSpinner from '../components/LoadingSpinner'
 import ScoreGauge from '../components/ScoreGauge'
 import EmptyState from '../components/EmptyState'
+
+const SAMPLE_RESUME = `Experienced web developer with 3+ years building responsive applications.
+- Built an e-commerce platform using React, Node.js, and PostgreSQL serving 10k+ users
+- Reduced page load time by 40% through code splitting and lazy loading
+- Led a team of 4 developers to deliver a SaaS product in 3 months
+- Implemented CI/CD pipeline reducing deployment time from 2 hours to 15 minutes`
 
 export default function ResumeAnalyzer() {
   const [file, setFile] = useState(null)
@@ -19,11 +26,51 @@ export default function ResumeAnalyzer() {
     try {
       const data = await uploadResume(file, targetRole)
       setResult(data)
+      saveResult('resume', { targetRole, atsScore: data.atsScore })
     } catch (e) {
       setError(e.message || 'Failed to analyze resume.')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleDemo = async () => {
+    setLoading(true)
+    setError('')
+    setResult(null)
+    setTargetRole('Full Stack Developer')
+    try {
+      const data = await analyzeResume(SAMPLE_RESUME, 'Full Stack Developer')
+      setResult(data)
+      saveResult('resume', { targetRole: 'Full Stack Developer', atsScore: data.atsScore })
+    } catch (e) {
+      setError(e.message || 'Demo failed.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleExport = () => {
+    if (!result) return
+    const text = [
+      `CampusConnect AI - Resume Analysis Report`,
+      `Target Role: ${targetRole}`,
+      `ATS Score: ${result.atsScore}/100`,
+      ``,
+      `Missing Keywords:`,
+      ...(result.missingKeywords || []).map(k => `  - ${k}`),
+      ``,
+      `Areas to Improve:`,
+      ...(result.weakPoints || []).map(p => `  - ${p}`),
+      ``,
+      `Suggestions:`,
+      ...(result.suggestions || []).map(s => `  - ${s}`),
+    ].join('\n')
+    const blob = new Blob([text], { type: 'text/plain' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `resume-analysis-${Date.now()}.txt`
+    a.click()
   }
 
   return (
@@ -59,24 +106,27 @@ export default function ResumeAnalyzer() {
             </select>
           </div>
         </div>
-        <button onClick={handleUpload} disabled={!file || !targetRole || loading} className="btn-primary">
-          {loading ? 'Analyzing...' : 'Analyze Resume'}
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button onClick={handleUpload} disabled={!file || !targetRole || loading} className="btn-primary">
+            {loading ? 'Analyzing...' : 'Analyze Resume'}
+          </button>
+          <button onClick={handleDemo} disabled={loading} className="btn-secondary">
+            Try Demo
+          </button>
+        </div>
       </div>
 
       {loading && <LoadingSpinner size="lg" />}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-danger rounded-xl p-4 mb-6 text-sm fade-in">
-          {error}
-        </div>
+        <div className="bg-red-50 border border-red-200 text-danger rounded-xl p-4 mb-6 text-sm fade-in">{error}</div>
       )}
 
       {!loading && !result && !error && (
         <EmptyState
           icon={<svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>}
           title="No resume analyzed yet"
-          description="Upload a PDF resume and select your target role to get started."
+          description="Upload a PDF resume or click 'Try Demo' to see it in action."
         />
       )}
 
@@ -84,6 +134,9 @@ export default function ResumeAnalyzer() {
         <div className="space-y-5 fade-in">
           <div className="glass-card rounded-2xl p-6 flex flex-col items-center">
             <ScoreGauge score={result.atsScore} label="ATS Score" />
+            <button onClick={handleExport} className="mt-4 text-sm text-primary hover:underline font-medium">
+              Download Report
+            </button>
           </div>
 
           {result.missingKeywords?.length > 0 && (

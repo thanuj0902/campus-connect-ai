@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { generateInterviewQuestions, submitInterviewAnswer } from '../services/api'
+import { saveResult } from '../services/history'
 import LoadingSpinner from '../components/LoadingSpinner'
 
 
@@ -59,6 +60,7 @@ export default function MockInterview() {
         setCurrentQ(next)
         timeoutRef.current = setTimeout(() => setChat((prev) => [...prev, { role: 'ai', text: questions[next] }]), 300)
       } else {
+        saveResult('interview', { domain, score: totalScore, questions: results.length })
         timeoutRef.current = setTimeout(() => setStage('completed'), 500)
       }
     } catch (e) {
@@ -90,9 +92,14 @@ export default function MockInterview() {
             <option value="Mobile Development">Mobile Development</option>
             <option value="Cybersecurity">Cybersecurity</option>
           </select>
-          <button onClick={startInterview} disabled={!domain || loading} className="btn-primary">
-            {loading ? 'Loading...' : 'Start Interview'}
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <button onClick={startInterview} disabled={!domain || loading} className="btn-primary">
+              {loading ? 'Loading...' : 'Start Interview'}
+            </button>
+            <button onClick={() => { setDomain('Web Development'); setTimeout(startInterview, 100) }} disabled={loading} className="btn-secondary">
+              Try Demo
+            </button>
+          </div>
         </div>
         {error && <div className="bg-red-50 border border-red-200 text-danger rounded-xl p-4 mt-4 text-sm fade-in">{error}</div>}
       </div>
@@ -102,6 +109,38 @@ export default function MockInterview() {
   if (loading && chat.length === 0) return <LoadingSpinner size="lg" />
 
   if (stage === 'completed') {
+    const downloadCertificate = () => {
+      const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      const html = `<!DOCTYPE html><html><head><style>
+        body{font-family:Georgia,serif;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f8f9fa;margin:0;padding:20px}
+        .cert{border:3px solid #6366f1;border-radius:20px;padding:50px;max-width:700px;text-align:center;background:white;box-shadow:0 20px 60px rgba(0,0,0,.1)}
+        h1{color:#6366f1;font-size:32px;margin:0 0 5px}
+        .sub{color:#666;font-size:14px;margin-bottom:30px}
+        .name{font-size:28px;font-weight:bold;margin:20px 0 10px}
+        .text{color:#444;font-size:16px;line-height:1.6}
+        .score{font-size:48px;font-weight:bold;color:#6366f1;margin:20px 0}
+        .domain{background:#f0f0ff;padding:8px 20px;border-radius:20px;display:inline-block;color:#6366f1;font-weight:600}
+        .date{color:#888;font-size:13px;margin-top:30px}
+        .seal{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;margin:20px auto 0;color:white;font-size:30px}
+      </style></head><body>
+        <div class="cert">
+          <h1>CampusConnect AI</h1>
+          <div class="sub">Certificate of Completion</div>
+          <div class="domain">${domain}</div>
+          <div class="name">Mock Interview</div>
+          <div class="text">Successfully completed an AI-powered mock interview</div>
+          <div class="score">${totalScore}/100</div>
+          <div class="text">${results.length} questions answered</div>
+          <div class="date">Completed on ${date}</div>
+          <div class="seal">&#10003;</div>
+        </div>
+      </body></html>`
+      const blob = new Blob([html], { type: 'text/html' })
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = `interview-certificate-${Date.now()}.html`
+      a.click()
+    }
     return (
       <div className="max-w-2xl mx-auto px-4 py-10 fade-in">
         <div className="glass-card rounded-2xl p-8 text-center">
@@ -134,9 +173,14 @@ export default function MockInterview() {
               ))}
             </div>
           </div>
-          <button onClick={() => setStage('setup')} className="btn-primary mt-8">
-            Practice Again
-          </button>
+          <div className="flex gap-3 justify-center mt-8">
+            <button onClick={() => setStage('setup')} className="btn-primary">
+              Practice Again
+            </button>
+            <button onClick={downloadCertificate} className="btn-secondary">
+              Download Certificate
+            </button>
+          </div>
         </div>
       </div>
     )

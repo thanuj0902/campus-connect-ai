@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import ModuleCard from '../components/ModuleCard'
+import { getHistory } from '../services/history'
 
 const modules = [
   {
@@ -56,6 +58,13 @@ const modules = [
 
 export default function Dashboard() {
   const { user } = useAuth()
+  const [history] = useState(() => getHistory())
+
+  const typeIcons = {
+    resume: '&#128196;',
+    roadmap: '&#128200;',
+    interview: '&#127908;',
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
@@ -65,11 +74,37 @@ export default function Dashboard() {
         </h1>
         <p className="text-text-muted mt-2 text-lg">Pick a tool to level up your career prep.</p>
       </div>
-      <div className="grid sm:grid-cols-2 gap-5">
+
+      <div className="grid sm:grid-cols-2 gap-5 mb-10">
         {modules.map((m, i) => (
           <ModuleCard key={m.title} {...m} index={i} />
         ))}
       </div>
+
+      {history.length > 0 && (
+        <div className="glass-card rounded-2xl p-6 fade-in">
+          <h2 className="font-semibold text-lg mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+            Recent Activity
+          </h2>
+          <div className="space-y-3">
+            {history.slice(0, 5).map((item, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-surface-alt text-sm">
+                <span className="text-lg">{typeIcons[item.type] || '&#128200;'}</span>
+                <div className="flex-1">
+                  <p className="font-medium capitalize">{item.type} Analysis</p>
+                  <p className="text-xs text-text-muted">{new Date(item.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                </div>
+                {item.data?.atsScore && (
+                  <span className={`font-bold text-sm ${item.data.atsScore >= 70 ? 'text-success' : item.data.atsScore >= 50 ? 'text-warning' : 'text-danger'}`}>
+                    {item.data.atsScore}/100
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
