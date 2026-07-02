@@ -4,10 +4,11 @@ import multer from 'multer'
 export const aiRouter = Router()
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
 
-const MODEL = 'gemini-2.0-flash'
+const GROQ_MODEL = 'mixtral-8x7b-32768'
+const GEMINI_MODEL = 'gemini-2.0-flash'
 
 function getApiKey() {
-  return process.env.GEMINI_API_KEY || process.env.ANTHROPIC_API_KEY
+  return process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY || process.env.ANTHROPIC_API_KEY
 }
 
 async function callAI(systemPrompt, userMessage) {
@@ -16,15 +17,46 @@ async function callAI(systemPrompt, userMessage) {
     return mockResponse(systemPrompt, userMessage)
   }
 
-  const isGemini = !!process.env.GEMINI_API_KEY
-
   try {
-    if (isGemini) {
+    if (process.env.GROQ_API_KEY) {
+      return await callGroq(apiKey, systemPrompt, userMessage)
+    }
+    if (process.env.GEMINI_API_KEY) {
       return await callGemini(apiKey, systemPrompt, userMessage)
     }
     return await callClaude(apiKey, systemPrompt, userMessage)
   } catch {
     return mockResponse(systemPrompt, userMessage)
+  }
+}
+
+async function callGroq(apiKey, systemPrompt, userMessage) {
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userMessage }
+      ],
+      max_tokens: 4096,
+      temperature: 0.7
+    })
+  })
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Groq API error: ${res.status} ${err}`)
+  }
+  const data = await res.json()
+  const text = data.choices?.[0]?.message?.content || ''
+  try {
+    return JSON.parse(text.replace(/```json\s*|\s*```/g, ''))
+  } catch {
+    return { raw: text }
   }
 }
 
@@ -34,7 +66,7 @@ async function callGemini(apiKey, systemPrompt, userMessage) {
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
       {
         signal: controller.signal,
         method: 'POST',
