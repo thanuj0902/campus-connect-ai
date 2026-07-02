@@ -48,6 +48,11 @@ export default function Navbar() {
                 Dashboard
               </Link>
             )}
+            {user && (
+              <Link to="/profile" className="text-[var(--text-muted)] hover:text-primary transition-colors text-sm font-medium">
+                Profile
+              </Link>
+            )}
             <button
               onClick={toggle}
               className="p-2 rounded-xl text-[var(--text-muted)] hover:text-primary hover:bg-primary/5 transition-all"
@@ -132,6 +137,11 @@ export default function Navbar() {
               {!isLanding && (
                 <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="text-[var(--text-muted)] hover:text-primary py-2 text-sm font-medium">
                   Dashboard
+                </Link>
+              )}
+              {user && (
+                <Link to="/profile" onClick={() => setMenuOpen(false)} className="text-[var(--text-muted)] hover:text-primary py-2 text-sm font-medium">
+                  Profile
                 </Link>
               )}
               {user ? (
