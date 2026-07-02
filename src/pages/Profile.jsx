@@ -50,7 +50,7 @@ export default function Profile() {
           <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" className="text-primary font-medium hover:underline">console.groq.com</a>
           {' '}(free, no credit card).
         </p>
-        <div className="flex gap-2">
+        <div className="flex gap-2 mb-3">
           <input
             type="text"
             value={apiKey}
@@ -62,7 +62,16 @@ export default function Profile() {
             {saved ? 'Saved!' : 'Save'}
           </button>
         </div>
-        <p className="text-xs text-text-muted mt-2">Your key is stored locally in your browser and never shared.</p>
+        <div className="mb-3">
+          <label className="block text-sm font-medium mb-1.5 text-text-muted">Provider</label>
+          <select value={provider} onChange={(e) => { setProvider(e.target.value); setSaved(false) }} className="select-field">
+            <option value="groq">Groq (free, fast)</option>
+            <option value="gemini">Google Gemini (free tier)</option>
+            <option value="openai">OpenAI</option>
+            <option value="claude">Anthropic Claude</option>
+          </select>
+        </div>
+        <p className="text-xs text-text-muted">Your key is stored locally in your browser and never shared.</p>
       </div>
 
       <div className="glass-card rounded-2xl p-6 mt-6">
