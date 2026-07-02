@@ -1,8 +1,24 @@
+import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import EmptyState from '../components/EmptyState'
 
 export default function Profile() {
   const { user, login } = useAuth()
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('cc_api_key') || '')
+  const [provider, setProvider] = useState(() => localStorage.getItem('cc_api_provider') || 'groq')
+  const [saved, setSaved] = useState(false)
+
+  const saveApiKey = () => {
+    if (apiKey.trim()) {
+      localStorage.setItem('cc_api_key', apiKey.trim())
+      localStorage.setItem('cc_api_provider', provider)
+    } else {
+      localStorage.removeItem('cc_api_key')
+      localStorage.removeItem('cc_api_provider')
+    }
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
 
   if (!user) {
     return (
@@ -25,6 +41,28 @@ export default function Profile() {
         <img src={user.photoURL} alt="" className="w-20 h-20 rounded-full mx-auto mb-4 ring-4 ring-primary/20 shadow-lg" onError={(e) => { e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><circle cx="40" cy="40" r="40" fill="%236366f1"/><text x="40" y="52" text-anchor="middle" fill="white" font-size="32" font-family="sans-serif">?</text></svg>' }} />
         <h1 className="text-2xl font-bold">{user.displayName}</h1>
         <p className="text-text-muted">{user.email}</p>
+      </div>
+
+      <div className="glass-card rounded-2xl p-6 mt-6">
+        <h2 className="font-semibold text-lg mb-3">Your API Key</h2>
+        <p className="text-sm text-text-muted mb-4 leading-relaxed">
+          Add your free Groq API key to get real AI responses. Get one at{' '}
+          <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" className="text-primary font-medium hover:underline">console.groq.com</a>
+          {' '}(free, no credit card).
+        </p>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={apiKey}
+            onChange={(e) => { setApiKey(e.target.value); setSaved(false) }}
+            placeholder="gsk_your-groq-api-key"
+            className="input-field flex-1 font-mono text-sm"
+          />
+          <button onClick={saveApiKey} className="btn-primary whitespace-nowrap">
+            {saved ? 'Saved!' : 'Save'}
+          </button>
+        </div>
+        <p className="text-xs text-text-muted mt-2">Your key is stored locally in your browser and never shared.</p>
       </div>
 
       <div className="glass-card rounded-2xl p-6 mt-6">

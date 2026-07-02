@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { generateInterviewQuestions, submitInterviewAnswer } from '../services/api'
 import LoadingSpinner from '../components/LoadingSpinner'
-import EmptyState from '../components/EmptyState'
+
 
 export default function MockInterview() {
   const [domain, setDomain] = useState('')

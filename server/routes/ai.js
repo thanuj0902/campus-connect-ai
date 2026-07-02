@@ -11,22 +11,51 @@ function getApiKey() {
   return process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY || process.env.ANTHROPIC_API_KEY
 }
 
-async function callAI(systemPrompt, userMessage) {
-  const apiKey = getApiKey()
+async function callAI(systemPrompt, userMessage, userKey, provider) {
+  const apiKey = userKey || getApiKey()
   if (!apiKey || apiKey.startsWith('your-')) {
     return mockResponse(systemPrompt, userMessage)
   }
 
+  const p = (provider || '').toLowerCase()
+
   try {
-    if (process.env.GROQ_API_KEY) {
-      return await callGroq(apiKey, systemPrompt, userMessage)
-    }
-    if (process.env.GEMINI_API_KEY) {
-      return await callGemini(apiKey, systemPrompt, userMessage)
-    }
-    return await callClaude(apiKey, systemPrompt, userMessage)
+    if (p === 'openai') return await callOpenAI(apiKey, systemPrompt, userMessage)
+    if (p === 'gemini') return await callGemini(apiKey, systemPrompt, userMessage)
+    if (p === 'claude') return await callClaude(apiKey, systemPrompt, userMessage)
+    return await callGroq(apiKey, systemPrompt, userMessage)
   } catch {
     return mockResponse(systemPrompt, userMessage)
+  }
+}
+
+async function callOpenAI(apiKey, systemPrompt, userMessage) {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userMessage }
+      ],
+      max_tokens: 4096,
+      temperature: 0.7
+    })
+  })
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`OpenAI API error: ${res.status} ${err}`)
+  }
+  const data = await res.json()
+  const text = data.choices?.[0]?.message?.content || ''
+  try {
+    return JSON.parse(text.replace(/```json\s*|\s*```/g, ''))
+  } catch {
+    return { raw: text }
   }
 }
 
@@ -146,9 +175,12 @@ aiRouter.post('/upload-resume', upload.single('resume'), async (req, res) => {
     const text = pdfResult.text.slice(0, 8000)
     pdf.destroy()
 
+    const userKey = req.headers['x-api-key']
+    const provider = req.headers['x-api-provider']
     const result = await callAI(
       'You are an expert ATS resume analyzer. Analyze the resume and return JSON with: atsScore (0-100), missingKeywords (array), weakPoints (array), suggestions (array). Be specific and actionable.',
-      `Resume:\n${text}\n\nTarget Role: ${targetRole}`
+      `Resume:\n${text}\n\nTarget Role: ${targetRole}`,
+      userKey, provider
     )
     res.json(result)
   } catch (e) {
@@ -161,9 +193,12 @@ aiRouter.post('/analyze-resume', async (req, res) => {
     const { text, targetRole } = req.body
     if (!text || !targetRole) return res.status(400).json({ error: 'Missing resume text or target role' })
     const truncated = text.slice(0, 8000)
+    const userKey = req.headers['x-api-key']
+    const provider = req.headers['x-api-provider']
     const result = await callAI(
       'You are an expert ATS resume analyzer. Analyze the resume and return JSON with: atsScore (0-100), missingKeywords (array), weakPoints (array), suggestions (array). Be specific and actionable.',
-      `Resume:\n${truncated}\n\nTarget Role: ${targetRole}`
+      `Resume:\n${truncated}\n\nTarget Role: ${targetRole}`,
+      userKey, provider
     )
     res.json(result)
   } catch (e) {
@@ -175,9 +210,12 @@ aiRouter.post('/generate-roadmap', async (req, res) => {
   try {
     const { currentSkills, targetRole, experienceLevel } = req.body
     if (!currentSkills || !targetRole) return res.status(400).json({ error: 'Missing skills or target role' })
+    const userKey = req.headers['x-api-key']
+    const provider = req.headers['x-api-provider']
     const result = await callAI(
       'You are a career roadmap generator. Return JSON with: { targetRole: string, months: array of { title, duration, items[] } }. Include specific free resources and project ideas.',
-      `Current skills: ${currentSkills.join(', ')}\nTarget role: ${targetRole}\nExperience: ${experienceLevel}`
+      `Current skills: ${currentSkills.join(', ')}\nTarget role: ${targetRole}\nExperience: ${experienceLevel}`,
+      userKey, provider
     )
     res.json(result)
   } catch (e) {
@@ -189,9 +227,12 @@ aiRouter.post('/generate-questions', async (req, res) => {
   try {
     const { domain } = req.body
     if (!domain) return res.status(400).json({ error: 'Missing domain' })
+    const userKey = req.headers['x-api-key']
+    const provider = req.headers['x-api-provider']
     const result = await callAI(
       'You are a technical interviewer. Generate 5 interview questions for the given domain. Return JSON: { questions: string[] }',
-      `Domain: ${domain}`
+      `Domain: ${domain}`,
+      userKey, provider
     )
     res.json(result)
   } catch (e) {
@@ -203,9 +244,12 @@ aiRouter.post('/evaluate-answer', async (req, res) => {
   try {
     const { question, answer, domain } = req.body
     if (!question || !answer) return res.status(400).json({ error: 'Missing question or answer' })
+    const userKey = req.headers['x-api-key']
+    const provider = req.headers['x-api-provider']
     const result = await callAI(
       'You are an interview coach. Evaluate the answer and return JSON: { score (0-100), feedback (string), idealAnswer (string) }',
-      `Domain: ${domain}\nQuestion: ${question}\nAnswer: ${answer}`
+      `Domain: ${domain}\nQuestion: ${question}\nAnswer: ${answer}`,
+      userKey, provider
     )
     res.json(result)
   } catch (e) {

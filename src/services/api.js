@@ -3,10 +3,21 @@ if (API_BASE !== '/api' && !API_BASE.match(/\/api\/?$/)) {
   API_BASE = API_BASE.replace(/\/+$/, '') + '/api'
 }
 
+function getApiKeyHeader() {
+  const key = localStorage.getItem('cc_api_key')
+  const provider = localStorage.getItem('cc_api_provider') || 'groq'
+  const headers = {}
+  if (key) {
+    headers['x-api-key'] = key
+    headers['x-api-provider'] = provider
+  }
+  return headers
+}
+
 async function fetchFromClaude(endpoint, body) {
   const res = await fetch(`${API_BASE}/claude/${endpoint}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getApiKeyHeader() },
     body: JSON.stringify(body),
   })
   if (!res.ok) {
@@ -22,6 +33,7 @@ export async function uploadResume(file, targetRole) {
   formData.append('targetRole', targetRole)
   const res = await fetch(`${API_BASE}/claude/upload-resume`, {
     method: 'POST',
+    headers: getApiKeyHeader(),
     body: formData,
   })
   if (!res.ok) {
